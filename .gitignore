@@ -12,3 +12,10 @@ birthday-surprise/
 drone-workshop-tool/
 neeharika-birthday/
 fix.py
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
