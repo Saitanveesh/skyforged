@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / PID Toolbox — Tactical Tuning Flow</title>
+  <meta name="description" content="Dedicated PID tuning and filter diagnostic flow for professional UAV systems. Made by Sai Tanveesh.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <style>
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      position: relative;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+    .step {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-layer);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+    .step.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+    .step.complete {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--bg);
+    }
+    .wizard-pane {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .wizard-pane.active {
+      display: block;
+    }
+    .symptom-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .symptom-card:hover {
+      border-color: var(--accent-alt);
+      background: rgba(255,51,102,0.05);
+    }
+    .symptom-card.selected {
+      border-color: var(--accent-alt);
+      background: rgba(255,51,102,0.1);
+      box-shadow: 0 0 10px rgba(255,51,102,0.1);
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ PID Tuning</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">The Bench</a></li>
+      <li><a href="academy.html">Academy</a></li>
+      <li><a href="blueprint.html">Blueprint</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="pid.html" class="active">PID Tuning</a></li>
+      <li><a href="handbook.html">Handbook</a></li>
+      <li><a href="platforms.html">Platforms</a></li>
+      <li><a href="tools.html">RF Tools</a></li>
+      <li><a href="ops.html">Ops Center</a></li>
+      <li><a href="builder.html">Builder</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+  </div></nav>
+
+  <div class="page-body">
+    <div class="container animate-in">
+      
+      <header style="margin-bottom:60px; text-align:center;">
+        <h1 class="hero-title" style="font-size: clamp(2rem, 5vw, 3.5rem);">PID <span class="text-gradient">Tuning Flow</span></h1>
+        <p style="color:var(--text-dim); max-width:600px; margin:0 auto;">Structured diagnostic flow for FPV systems. Transition from a noisy build to a locked-in tactical platform.</p>
+      </header>
+
+      <div class="max-600" style="margin: 0 auto;">
+        
+        <div class="stepper">
+          <div class="step active" id="step1">1</div>
+          <div class="step" id="step2">2</div>
+          <div class="step" id="step3">3</div>
+          <div class="step" id="step4">4</div>
+        </div>
+
+        <!-- Stage 1: Structural X-Ray Audit -->
+        <div class="wizard-pane active" id="pane1">
+          <div class="glass" style="padding:32px;">
+            <h2 style="font-size:1.4rem; margin-bottom:16px; color:var(--accent);">Phase 1: Structural X-Ray Audit</h2>
+            <p style="color:var(--text-dim); margin-bottom:24px; font-size:0.95rem;">Ping components to check for mechanical resonance. 90% of noise is structural.</p>
+            
+            <!-- Interactive Schematic -->
+            <div style="position:relative; height:300px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:32px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+              <!-- Synthetic Grid -->
+              <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px), linear-gradient(0deg, rgba(0,255,255,0.03) 1px, transparent 1px); background-size: 20px 20px;"></div>
+              
+              <!-- Drone Schematic Body -->
+              <div id="schematic" style="position:relative; width:120px; height:120px; background:rgba(255,255,255,0.05); border:2px solid var(--border); transform:rotate(45deg);">
+                <!-- Arms / Motors -->
+                <div class="motor-arm" onclick="pingComponent('Arm 1 (Front Left)')" style="position:absolute; top:-60px; left:-60px; width:60px; height:60px; border:1px solid var(--border); cursor:pointer;"></div>
+                <div class="motor-arm" onclick="pingComponent('Arm 2 (Front Right)')" style="position:absolute; top:-60px; right:-60px; width:60px; height:60px; border:1px solid var(--border); cursor:pointer;"></div>
+                <div class="motor-arm" onclick="pingComponent('Arm 3 (Rear Left)')" style="position:absolute; bottom:-60px; left:-60px; width:60px; height:60px; border:1px solid var(--border); cursor:pointer;"></div>
+                <div class="motor-arm" onclick="pingComponent('Arm 4 (Rear Right)')" style="position:absolute; bottom:-60px; right:-60px; width:60px; height:60px; border:1px solid var(--border); cursor:pointer;"></div>
+                
+                <!-- Center (Stack/FC) -->
+                <div onclick="pingComponent('Central Stack / Gyro')" style="position:absolute; inset:20px; background:rgba(0,255,255,0.1); border:1px solid var(--accent); cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                  <span style="transform:rotate(-45deg); font-family:var(--font-mono); font-size:0.6rem; color:var(--accent);">CORE</span>
+                </div>
+              </div>
+              
+              <div id="pingReport" style="position:absolute; bottom:10px; right:10px; font-family:var(--font-mono); font-size:0.7rem; color:var(--accent);">STATUS: READY_FOR_SCAN</div>
+            </div>
+
+            <div id="pingAnalysis" class="callout" style="display:none; margin-bottom:32px;">
+              <p id="pingText">Analysis pending...</p>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;" onclick="nextStep(2)">Structural Integrity Confirmed →</button>
+          </div>
+        </div>
+
+        <!-- Stage 2: Harmonic Suppression (EQ Mode) -->
+        <div class="wizard-pane" id="pane2">
+          <div class="glass" style="padding:32px;">
+            <h2 style="font-size:1.4rem; margin-bottom:16px; color:var(--accent);">Phase 2: Harmonic Suppression</h2>
+            <p style="color:var(--text-dim); margin-bottom:24px; font-size:0.95rem;">Drag the "Filter Pills" to suppress motor harmonics and resonance peaks.</p>
+            
+            <!-- Spectral EQ Simulator -->
+            <div style="margin-bottom:32px;">
+              <div style="position:relative; background:#050505; border:1px solid var(--border); border-radius:var(--radius); height:180px; overflow:hidden; margin-bottom:16px;">
+                <canvas id="eqCanvas" width="600" height="180" style="width:100%; height:100%;"></canvas>
+                <!-- Draggable Pills (Simulated with simple inputs for feasibility) -->
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label style="font-size:0.7rem;">Notch Filter 1 (Hz)</label>
+                  <input type="range" id="notch1" min="100" max="450" value="280" oninput="updateEQ()">
+                </div>
+                <div class="form-group">
+                  <label style="font-size:0.7rem;">Notch Filter 2 (Hz)</label>
+                  <input type="range" id="notch2" min="100" max="450" value="400" oninput="updateEQ()">
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:16px;">
+              <button class="btn glass" onclick="nextStep(1)">← Back</button>
+              <button class="btn btn-primary" style="flex:1;" onclick="nextStep(3)">Harmonics Suppressed →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 3: Response Prototyper -->
+        <div class="wizard-pane" id="pane3">
+          <div class="glass" style="padding:32px;">
+            <h2 style="font-size:1.4rem; margin-bottom:16px; color:var(--accent);">Phase 3: Response Prototyper</h2>
+            <p style="color:var(--text-dim); margin-bottom:24px; font-size:0.95rem;">Simulate stick response. Balance "Crispness" vs "Stability" to find your flight feel.</p>
+            
+            <!-- Stick Response Visualizer -->
+            <div style="margin-bottom:32px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:0.8rem; color:var(--text-dim);">Flight Confidence</span>
+                <span id="latencyDisplay" style="font-family:var(--font-mono); font-size:0.8rem; color:var(--accent);">1.8ms Delay</span>
+              </div>
+              <input type="range" id="confidenceSlider" min="1" max="10" value="7" style="width:100%; margin-bottom:20px;" oninput="updateResponseSim()">
+              
+              <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:var(--text-muted);">
+                <span>STABLE / SOFT</span>
+                <span>CRISP / AGGRESSIVE</span>
+              </div>
+            </div>
+
+            <div id="simVerdict" class="callout info" style="margin-bottom:32px;">
+              <p>Current: <strong>Optimal Response</strong>. Suitable for tactical racing.</p>
+            </div>
+
+            <div style="display:flex; gap:16px;">
+              <button class="btn glass" onclick="nextStep(2)">← Back</button>
+              <button class="btn btn-primary" style="flex:1;" onclick="nextStep(4)">Response Prototyped →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 4: Mission Deployment Hub -->
+        <div class="wizard-pane" id="pane4">
+          <div class="glass" style="padding:32px;">
+            <h2 style="font-size:1.4rem; margin-bottom:16px; color:var(--accent);">Phase 4: Mission Deployment</h2>
+            <p style="color:var(--text-dim); margin-bottom:24px; font-size:0.95rem;">Final system validation. Export presets based on mission profile.</p>
+            
+            <div class="cards-grid" style="grid-template-columns:1fr; gap:16px; margin-bottom:32px;">
+              <div class="symptom-card" style="display:flex; justify-content:space-between; align-items:center;" onclick="exportPreset('acro')">
+                <span>Acro / Tactical Racing</span>
+                <span style="color:var(--accent); font-size:0.7rem;">MAX_AUTHORITY</span>
+              </div>
+              <div class="symptom-card" style="display:flex; justify-content:space-between; align-items:center;" onclick="exportPreset('cinematic')">
+                <span>Cinematic / Smooth-Cam</span>
+                <span style="color:var(--accent); font-size:0.7rem;">MIN_VIBRATION</span>
+              </div>
+              <div class="symptom-card" style="display:flex; justify-content:space-between; align-items:center;" onclick="exportPreset('longrange')">
+                <span>Long Range / Endurance</span>
+                <span style="color:var(--accent); font-size:0.7rem;">EFFICIENCY_MAX</span>
+              </div>
+            </div>
+
+            <div id="exportStatus" class="result-box" style="display:none; margin-bottom:24px;"></div>
+
+            <div style="display:flex; gap:16px;">
+              <button class="btn glass" onclick="nextStep(3)">← Back</button>
+              <button class="btn btn-primary" style="flex:1;" onclick="location.reload()">Reset Hangar Diagnostic</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="tools.html">Tools</a>
+      <a href="builder.html">Builder</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/pid.js"></script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / Platforms Database</title>
+  <meta name="description" content="Browse 30+ drone platforms with specs, compliance status, and integration details. Focused on DGCA Type Certification and Indian UAV specs.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛩️</text></svg>">
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Platforms</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">The Bench</a></li>
+      <li><a href="academy.html">Academy</a></li>
+      <li><a href="anatomy.html">Anatomy</a></li>
+      <li><a href="blueprint.html">Blueprint</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="pid.html">PID Tuning</a></li>
+      <li><a href="handbook.html">Handbook</a></li>
+      <li><a href="platforms.html" class="active">Platforms</a></li>
+      <li><a href="tools.html">RF Tools</a></li>
+      <li><a href="ops.html">Ops Center</a></li>
+      <li><a href="builder.html">Builder</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+  </div></nav>
+
+  <div class="page-body">
+    <div class="container">
+      <h1 style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;margin-bottom:8px;">Platform Database (India)</h1>
+      <p style="color:var(--text-dim);margin-bottom:24px;max-width:640px;">Defense and commercial drone platforms. DGCA Type Certification, Digital Sky compliance, and Indian UAV manufacturing data.</p>
+
+      <!-- Search -->
+      <div class="form-row" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Search Platforms</label>
+          <input type="text" id="platformSearch" placeholder="Search by name, manufacturer..." oninput="filterPlatforms()">
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="platform-filters" id="platformFilters">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+        <button class="filter-btn" data-filter="cots" onclick="setFilter('cots')">Consumer</button>
+        <button class="filter-btn" data-filter="dgca" onclick="setFilter('dgca')">DGCA Certified</button>
+        <button class="filter-btn" data-filter="custom-build" onclick="setFilter('custom-build')">Custom</button>
+        <button class="filter-btn" data-filter="tactical" onclick="setFilter('tactical')">Defense / Tactical</button>
+      </div>
+
+      <!-- Platform List -->
+      <div id="platformList"></div>
+
+      <!-- Stats -->
+      <div style="margin-top:40px;padding:24px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);">
+        <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;">Database Stats</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:16px;">
+          <div><span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent);display:block;" id="statTotal">0</span><span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;">Total Platforms</span></div>
+          <div><span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-green);display:block;" id="statBlue">0</span><span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;">DGCA Certified</span></div>
+          <div><span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-amber);display:block;" id="statCots">0</span><span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;">Consumer</span></div>
+          <div><span style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-alt);display:block;" id="statTactical">0</span><span style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;">Defense</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="tools.html">Tools</a>
+      <a href="builder.html">Builder</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/platforms.js"></script>
+</body>
+</html>

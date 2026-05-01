@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / Ops Center — Tactical Calculators & Pre-Flight</title>
+  <meta name="description" content="Flight time calculators, payload estimators, and pre-flight "go / no-go" matrix. Made by Sai Tanveesh.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Ops</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">The Bench</a></li>
+        <li><a href="academy.html">Academy</a></li>
+        <li><a href="anatomy.html">Anatomy</a></li>
+        <li><a href="blueprint.html">Blueprint</a></li>
+        <li><a href="maps.html">Maps</a></li>
+        <li><a href="pid.html">PID Tuning</a></li>
+        <li><a href="handbook.html">Handbook</a></li>
+        <li><a href="platforms.html">Platforms</a></li>
+        <li><a href="tools.html">RF Tools</a></li>
+        <li><a href="ops.html" class="active">Ops Center</a></li>
+        <li><a href="builder.html">Builder</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+    </div>
+  </nav>
+
+  <!-- Search Overlay -->
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search handbook, tools, platforms...">
+        <span class="search-kbd">ESC</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="container animate-in">
+    <div class="header-module">
+      <h1 class="hero-title" style="font-size:2.5rem;text-align:left;">Ops Center</h1>
+      <p class="hero-subtitle" style="text-align:left;max-width:600px;margin:10px 0 0;">
+        Tactical calculators and pre-flight intelligence for drone operators. Calculate flight times, payload limits, and assess environmental safety.
+      </p>
+    </div>
+
+    <!-- 1. Flight Time & Payload Estimator -->
+    <div class="card tool-section" id="flight-time" style="position:relative; z-index:10;">
+      <div class="tool-header">
+        <div class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div>
+          <h2 class="tool-title">Flight Time & Payload Estimator</h2>
+          <p class="tool-desc">Calculate expected hover time and safe payload limits based on AUW, battery capacity, and motor efficiency (g/W). All fields support custom values.</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>All-Up Weight (g) <span style="font-size:0.6rem;color:var(--text-muted)">(incl. battery)</span></label>
+          <input type="number" id="ftAuw" value="1200" step="10" oninput="calcFlightTime()">
+        </div>
+        <div class="form-group">
+          <label>Battery Capacity (mAh)</label>
+          <input type="number" id="ftCap" value="1550" step="50" oninput="calcFlightTime()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Battery Cell Count (S)</label>
+          <input type="number" id="ftCells" value="6" min="1" max="16" oninput="calcFlightTime()">
+        </div>
+        <div class="form-group">
+          <label>Motor Hover Efficiency (g/W)</label>
+          <input type="number" id="ftEff" value="5" step="0.1" oninput="calcFlightTime()">
+        </div>
+      </div>
+      
+      <div class="result-box visible" style="display:flex;gap:24px;flex-wrap:wrap;margin-top:24px;">
+        <div style="flex:1;min-width:150px;">
+          <div class="result-label">Hover Time (Est)</div>
+          <div id="outHoverMins" class="result-value" style="font-size:1.5rem;">—</div>
+        </div>
+        <div style="flex:1;min-width:150px;">
+          <div class="result-label">Aggressive Flight</div>
+          <div id="outMixMins" class="result-value" style="font-size:1.5rem;color:var(--text);">—</div>
+        </div>
+        <div style="flex:1;min-width:150px;border-left:1px dashed var(--border);padding-left:24px;">
+          <div class="result-label" style="color:var(--warning);">Max Payload Capacity (Safe)</div>
+          <div id="outPayload" class="result-value" style="font-size:1.2rem;color:var(--warning);">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Pre-Flight Go/No-Go Matrix -->
+    <div class="card tool-section" id="go-nogo" style="position:relative; z-index:10;">
+      <div class="tool-header">
+        <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div>
+          <h2 class="tool-title">Tactical Go / No-Go Matrix</h2>
+          <p class="tool-desc">Environmental and hardware safety checklist. Kp Index > 5 degrades GPS lock significantly.</p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Wind Speed (km/h)</label>
+          <input type="number" id="gnWind" value="15" oninput="calcGoNoGo()">
+        </div>
+        <div class="form-group">
+          <label>Solar Kp Index (0-9)</label>
+          <input type="number" id="gnKp" value="2" min="0" max="9" oninput="calcGoNoGo()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>GPS Satellites Locked</label>
+          <input type="number" id="gnSats" value="14" oninput="calcGoNoGo()">
+        </div>
+        <div class="form-group">
+          <label>Battery Starting Voltage</label>
+          <select id="gnBatt" onchange="calcGoNoGo()">
+            <option value="full">Fully Charged (4.2V/cell)</option>
+            <option value="storage">Storage (~3.8V/cell) [WARNING]</option>
+            <option value="low">Low (<3.6V/cell) [DANGER]</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="gnResultBox" class="result-box visible" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:32px;margin-top:24px;">
+        <div style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.85rem;">Awaiting input...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="tools.html">Tools</a>
+      <a href="platforms.html">Platforms</a>
+      <a href="builder.html">Builder</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/ops.js"></script>
+</body>
+</html>

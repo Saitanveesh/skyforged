@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / Tools — RF Calculators & Integration Utilities</title>
+  <meta name="description" content="Physics-accurate RF calculators for drone systems. FPV channel planner, Friis link budget, Fresnel zones, and harmonics checking. Made by Sai Tanveesh.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Tools</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">The Bench</a></li>
+      <li><a href="academy.html">Academy</a></li>
+      <li><a href="anatomy.html">Anatomy</a></li>
+      <li><a href="blueprint.html">Blueprint</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="pid.html">PID Tuning</a></li>
+      <li><a href="handbook.html">Handbook</a></li>
+      <li><a href="platforms.html">Platforms</a></li>
+      <li><a href="tools.html" class="active">RF Tools</a></li>
+      <li><a href="ops.html">Ops Center</a></li>
+      <li><a href="builder.html">Builder</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+  </div></nav>
+ 
+  <div class="page-body">
+    <div class="container">
+      <div class="tools-grid">
+ 
+        <!-- 1. FPV Channel Planner -->
+        <div class="tool-section" id="channel-planner">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M2 12h4l3-9 4 18 3-9h4"/></svg></div>
+            <div>
+              <h2 class="tool-title">FPV Channel Planner</h2>
+              <p class="tool-desc">Plan 5.8 GHz FPV channels for up to 6 simultaneous pilots. Flags conflicts where channels are too close (&lt;40 MHz separation causes crosstalk).</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Number of Pilots</label>
+              <select id="pilotCount" onchange="updateChannelPlanner()">
+                <option value="2">2 Pilots</option>
+                <option value="3">3 Pilots</option>
+                <option value="4">4 Pilots</option>
+                <option value="5">5 Pilots</option>
+                <option value="6">6 Pilots</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Band Preference</label>
+              <select id="bandPref" onchange="updateChannelPlanner()">
+                <option value="raceband">RaceBand (R)</option>
+                <option value="fatshark">Fatshark (F)</option>
+                <option value="auto">Auto (best spacing)</option>
+              </select>
+            </div>
+          </div>
+          <div id="channelResults" class="result-box visible"></div>
+          <div class="callout" style="margin-top:20px;">
+            <div class="callout-title">Beginner Tip: Radio Safety</div>
+            <p>Always turn your <strong>Radio Controller ON first</strong> before plugging in your drone's battery. This ensures the drone is always "listening" to your commands from the start.</p>
+          </div>
+        </div>
+ 
+        <!-- 2. Harmonics Calculator -->
+        <div class="tool-section" id="harmonics">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+            <div>
+              <h2 class="tool-title">Harmonics Calculator</h2>
+              <p class="tool-desc">Every transmitter generates harmonics. Check for interference with FPV video channels AND GPS/GNSS receivers (L1: 1575.42 MHz, L2: 1227.60 MHz).</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>TX Frequency (MHz)</label>
+              <input type="number" id="harmonicFreq" value="915" step="0.1" oninput="calcHarmonics()">
+            </div>
+            <div class="form-group">
+              <label>Number of Harmonics</label>
+              <select id="harmonicCount" onchange="calcHarmonics()">
+                <option value="5">5</option>
+                <option value="8" selected>8</option>
+                <option value="12">12</option>
+              </select>
+            </div>
+          </div>
+          <div id="harmonicResults" class="result-box visible"></div>
+        </div>
+ 
+        <!-- 3. Range Estimator -->
+        <div class="tool-section" id="range-estimator">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg></div>
+            <div>
+              <h2 class="tool-title">Range Estimator (Link Budget)</h2>
+              <p class="tool-desc">Friis transmission equation link budget for FPV and control links. Calculates usable range from TX power, antenna gains, frequency, and receiver sensitivity.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>TX Power (dBm)</label>
+              <input type="number" id="rangeTxPower" value="20" step="1" oninput="calcRange()">
+            </div>
+            <div class="form-group">
+              <label>TX Antenna Gain (dBi)</label>
+              <input type="number" id="rangeTxGain" value="2" step="0.5" oninput="calcRange()">
+            </div>
+            <div class="form-group">
+              <label>RX Antenna Gain (dBi)</label>
+              <input type="number" id="rangeRxGain" value="2" step="0.5" oninput="calcRange()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Frequency (MHz)</label>
+              <input type="number" id="rangeFreq" value="2400" step="1" oninput="calcRange()">
+            </div>
+            <div class="form-group">
+              <label>RX Sensitivity (dBm)</label>
+              <input type="number" id="rangeRxSens" value="-112" step="1" oninput="calcRange()">
+            </div>
+            <div class="form-group">
+              <label>Required Margin (dB)</label>
+              <input type="number" id="rangeMargin" value="10" step="1" oninput="calcRange()">
+            </div>
+          </div>
+          <div id="rangeResults" class="result-box visible"></div>
+          <div class="callout warn" style="margin-top:20px;">
+            <div class="callout-title">Beginner Tip: Link Margin</div>
+            <p>Never plan for 0 dB margin. <strong>Aim for at least 15-20 dB.</strong> This "safety buffer" accounts for trees, antenna nulls, and sudden interference.</p>
+          </div>
+        </div>
+ 
+        <!-- 4. Fresnel Zone Calculator -->
+        <div class="tool-section" id="fresnel">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="6"/><ellipse cx="12" cy="12" rx="6" ry="3.6"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+            <div>
+              <h2 class="tool-title">Fresnel Zone Calculator</h2>
+              <p class="tool-desc">The first Fresnel zone must be 60% clear of obstructions for a clean RF link. Calculate maximum zone radius at any point along the path.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Frequency (MHz)</label>
+              <input type="number" id="fresnelFreq" value="5800" step="1" oninput="calcFresnel()">
+            </div>
+            <div class="form-group">
+              <label>Total Distance (m)</label>
+              <input type="number" id="fresnelDist" value="1000" step="100" oninput="calcFresnel()">
+            </div>
+            <div class="form-group">
+              <label>Distance to Obstacle (m)</label>
+              <input type="number" id="fresnelObstacle" value="500" step="50" oninput="calcFresnel()">
+            </div>
+          </div>
+          <div id="fresnelResults" class="result-box visible"></div>
+        </div>
+ 
+        <!-- 5. Dipole Antenna Calculator -->
+        <div class="tool-section" id="dipole">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="18" x2="16" y2="18"/><circle cx="12" cy="12" r="2"/></svg></div>
+            <div>
+              <h2 class="tool-title">Dipole Antenna Calculator</h2>
+              <p class="tool-desc">Calculate quarter-wave and half-wave antenna element lengths for any frequency. Account for velocity factor of coax or wire.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Frequency (MHz)</label>
+              <input type="number" id="dipoleFreq" value="915" step="1" oninput="calcDipole()">
+            </div>
+            <div class="form-group">
+              <label>Velocity Factor</label>
+              <input type="number" id="dipoleVF" value="0.95" step="0.01" min="0.5" max="1" oninput="calcDipole()">
+            </div>
+          </div>
+          <div id="dipoleResults" class="result-box visible"></div>
+        </div>
+ 
+        <!-- 6. Frequency Lookup -->
+        <div class="tool-section" id="freq-lookup">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+            <div>
+              <h2 class="tool-title">Nearest FPV Channel Lookup</h2>
+              <p class="tool-desc">Find the nearest named FPV channel to any target frequency. Useful when operating on non-standard or modified bands.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Target Frequency (MHz)</label>
+              <input type="number" id="freqLookup" value="5800" step="1" oninput="lookupFreq()">
+            </div>
+          </div>
+          <div id="freqResults" class="result-box visible"></div>
+        </div>
+ 
+        <!-- 7. VTX Table Generator -->
+        <div class="tool-section" id="vtx-table">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><polyline points="4,17 10,11 4,5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+            <div>
+              <h2 class="tool-title">VTX Table Generator</h2>
+              <p class="tool-desc">Generate a region-unlocked vtxtable for Betaflight — all bands, all channels, all power levels. Copy, paste into CLI, type <code>save</code>.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>VTX Model</label>
+              <select id="vtxModel" onchange="generateVtxTable()">
+                <option value="generic">Generic (25-600mW)</option>
+                <option value="rush_tank">Rush Tank Ultimate</option>
+                <option value="tbs_unify">TBS Unify Pro32</option>
+                <option value="hdzero">HDZero Race V3</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Power Levels</label>
+              <select id="vtxPower" onchange="generateVtxTable()">
+                <option value="all">All (Unlocked)</option>
+                <option value="safe">Safe (≤200mW)</option>
+              </select>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <pre id="vtxOutput" style="font-size:0.75rem;max-height:300px;overflow-y:auto;"></pre>
+            <button class="btn btn-sm" style="position:absolute;top:8px;right:8px;" onclick="copyVtxTable()">Copy</button>
+          </div>
+        </div>
+ 
+        <!-- 8. FC Target Matcher -->
+        <div class="tool-section" id="fc-matcher">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 1v3"/><path d="M15 1v3"/><path d="M9 20v3"/><path d="M15 20v3"/><path d="M20 9h3"/><path d="M20 14h3"/><path d="M1 9h3"/><path d="M1 14h3"/></svg></div>
+            <div>
+              <h2 class="tool-title">FC Target Matcher</h2>
+              <p class="tool-desc">Paste your Betaflight CLI <code>status</code> output to identify your flight controller target.</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Paste Betaflight CLI Status Output</label>
+            <textarea id="fcStatusInput" rows="6" style="width:100%;font-family:var(--font-mono);font-size:0.8rem;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);resize:vertical;outline:none;" placeholder="Paste 'status' output here..." oninput="matchFcTarget()"></textarea>
+          </div>
+          <div id="fcResults" class="result-box"></div>
+        </div>
+ 
+        <!-- 9. ELRS Reference -->
+        <div class="tool-section" id="elrs-ref">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0"/><path d="M1.42 9a16 16 0 0121.16 0"/><path d="M8.53 16.11a6 6 0 016.95 0"/><circle cx="12" cy="20" r="1"/></svg></div>
+            <div>
+              <h2 class="tool-title">ExpressLRS Reference</h2>
+              <p class="tool-desc">ExpressLRS hardware reference — frequency bands, common hardware, firmware links.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Parameter</th><th>2.4 GHz</th><th>900 MHz</th></tr></thead>
+              <tbody>
+                <tr><td>Frequency Range</td><td class="highlight">2400–2480 MHz</td><td class="highlight">868/915 MHz</td></tr>
+                <tr><td>Max TX Power</td><td>100 mW (20 dBm)</td><td>1 W (30 dBm)</td></tr>
+                <tr><td>Sensitivity (500 Hz)</td><td>-108 dBm</td><td>—</td></tr>
+                <tr><td>Sensitivity (50 Hz)</td><td>-115 dBm</td><td>-123 dBm</td></tr>
+                <tr><td>Typical Range (open)</td><td>10-30 km</td><td>30-100+ km</td></tr>
+                <tr><td>Latency (500 Hz)</td><td>~2 ms</td><td>—</td></tr>
+                <tr><td>Latency (50 Hz)</td><td>~20 ms</td><td>~20 ms</td></tr>
+                <tr><td>Common TX</td><td>RadioMaster Ranger, NamimnoRC Flash</td><td>BETAFPV Nano 900</td></tr>
+                <tr><td>Common RX</td><td>BetaFPV Nano, HappyModel EP1/EP2</td><td>HappyModel ES900RX</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="https://expresslrs.org/quick-start/getting-started/" target="_blank" class="btn btn-sm">ELRS Configurator →</a>
+            <a href="https://github.com/ExpressLRS/ExpressLRS/releases" target="_blank" class="btn btn-sm">GitHub Releases →</a>
+            <a href="https://expresslrs.org/hardware/supported-hardware/" target="_blank" class="btn btn-sm">Supported Hardware →</a>
+          </div>
+        </div>
+
+        <!-- 10. SWR & Return Loss Converter -->
+        <div class="tool-section" id="swr-converter">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <div>
+              <h2 class="tool-title">SWR / Return Loss Converter</h2>
+              <p class="tool-desc">Convert between VSWR, Return Loss (dB), and Reflection Coefficient (Γ). Crucial for checking antenna health and cable quality.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>SWR (e.g., 1.5)</label>
+              <input type="number" id="swrInput" value="1.5" step="0.1" oninput="calcSWR('swr')">
+            </div>
+            <div class="form-group">
+              <label>Return Loss (dB)</label>
+              <input type="number" id="rlInput" value="13.9" step="0.1" oninput="calcSWR('rl')">
+            </div>
+          </div>
+          <div id="swrResults" class="result-box visible"></div>
+        </div>
+
+        <!-- 11. Antenna Downtilt Calculator -->
+        <div class="tool-section" id="downtilt-calc">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22v-5"/><path d="M5 8l7-5 7 5"/><path d="M12 3v10"/></svg></div>
+            <div>
+              <h2 class="tool-title">Antenna Downtilt Calculator</h2>
+              <p class="tool-desc">Calculate mechanical downtilt for your GCS antenna based on altitude and range. Maximizes link quality by aligning main lobes.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>AGL Altitude (m)</label>
+              <input type="number" id="tiltAlt" value="100" step="1" oninput="calcDowntilt()">
+            </div>
+            <div class="form-group">
+              <label>Ground Distance (m)</label>
+              <input type="number" id="tiltDist" value="500" step="1" oninput="calcDowntilt()">
+            </div>
+          </div>
+          <div id="tiltResults" class="result-box visible"></div>
+        </div>
+
+        <!-- 12. EIRP Budget Calculator -->
+        <div class="tool-section" id="eirp-calc">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+            <div>
+              <h2 class="tool-title">EIRP Budget Calculator</h2>
+              <p class="tool-desc">Calculate Effective Isotropic Radiated Power. Accounts for TX power, cable attenuation, and antenna gain. Stay within legal limits!</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>TX Power (dBm)</label>
+              <input type="number" id="eirpTx" value="30" step="1" oninput="calcEirp()">
+            </div>
+            <div class="form-group">
+              <label>Cable Loss (dB)</label>
+              <input type="number" id="eirpLoss" value="1.5" step="0.1" oninput="calcEirp()">
+            </div>
+            <div class="form-group">
+              <label>Antenna Gain (dBi)</label>
+              <input type="number" id="eirpGain" value="12" step="0.5" oninput="calcEirp()">
+            </div>
+          </div>
+          <div id="eirpResults" class="result-box visible"></div>
+        </div>
+
+        <!-- 13. Polarization Loss -->
+        <div class="tool-section" id="polar-loss">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 12h20"/><path d="m19 9-7 7-7-7"/></svg></div>
+            <div>
+              <h2 class="tool-title">Polarization Loss</h2>
+              <p class="tool-desc">Signal loss due to antenna misalignment (e.g., banking turns). Cross-polarization can lead to sudden, total signal drops.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Misalignment Angle (deg)</label>
+              <input type="range" id="polarAngle" min="0" max="90" value="45" oninput="calcPolarization()">
+              <div id="polarAngleVal" style="font-family:var(--font-mono);font-size:0.75rem;margin-top:8px;">45°</div>
+            </div>
+          </div>
+          <div id="polarResults" class="result-box visible"></div>
+        </div>
+        <!-- 14. Dedicated Tactical Map Link -->
+        <div class="tool-section">
+          <div class="tool-header">
+            <div class="tool-icon"><svg viewBox="0 0 24 24"><polygon points="1,6 1,22 8,18 16,22 23,18 23,2 16,6 8,2"/></svg></div>
+            <div>
+              <h2 class="tool-title">DGCA Interactive Airspace Map</h2>
+              <p class="tool-desc">The map has been moved to a dedicated tactical experience for better visibility and performance.</p>
+            </div>
+          </div>
+          <div style="padding:40px; border:1px dashed var(--border); border-radius:var(--radius); text-align:center; background:rgba(0,255,255,0.02);">
+            <p style="color:var(--text-dim); margin-bottom:20px;">For full mission planning and airspace intelligence:</p>
+            <a href="maps.html" class="btn btn-primary">Launch Dedicated Map →</a>
+          </div>
+        </div>
+
+        <!-- 15. Mission Logistics: Supply Drop -->
+        <div class="tool-section" style="text-align:center; padding: 40px; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: var(--radius); margin-top: 20px;">
+          <div style="max-width: 500px; margin: 0 auto;">
+            <h2 style="font-size: 1.5rem; margin-bottom: 12px; color: var(--accent); text-transform:uppercase; letter-spacing: 0.1em;">Mission Logistics: Supply Drop</h2>
+            <p style="color: var(--text-dim); margin-bottom: 24px; line-height: 1.6;">
+              SkyForged operates as a proprietary intelligence platform for the FPV and drone engineering community. If these tactical calculators prevented a burnt VTX, optimized your link budget, or accelerated your build, consider calling in a supply drop (buying a chai). It sustains the servers and funds continuous R&D. Entirely optional, highly appreciated.
+            </p>
+            <a href="https://chai4.me/saitanveesh" target="_blank" title="Support saitanveesh on Chai4Me" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;background:#ffffff;padding:8px 32px;border-radius:16px;text-decoration:none;border:1px solid #e5e7eb;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"><img src="https://chai4.me/icons/wordmark.png" alt="Chai4Me" style="height:32px;object-fit:contain;margin-bottom:4px;"/><span style="color:#6b7280;font-family:sans-serif;font-size:14px;font-weight:600;">@saitanveesh</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+ 
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="tools.html">Tools</a>
+      <a href="builder.html">Builder</a>
+    </div>
+  </footer>
+ 
+  <script src="js/main.js"></script>
+  <script src="js/tools.js"></script>
+</body>
+</html>

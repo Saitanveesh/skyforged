@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / Anatomy of FPV — Interactive Breakdown</title>
+  <meta name="description" content="Exploded-view interactive breakdown of a real FPV drone. Scroll to dissect every component. Made by Sai Tanveesh.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛸</text></svg>">
+  <style>
+    body { background: #000; overflow-x: hidden; }
+
+    /* ─── Scrollytelling Layout ─── */
+    .anatomy-wrapper {
+      position: relative;
+      height: 600vh;
+    }
+    .sticky-scene {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at center, #080d14 0%, #000 70%);
+    }
+
+    /* ─── Holographic Grid ─── */
+    .holo-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* ─── Drone Stack ─── */
+    .drone-stage {
+      position: relative;
+      width: 420px;
+      height: 420px;
+      transform-style: preserve-3d;
+      perspective: 1400px;
+    }
+    .layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.08s linear, opacity 0.3s ease;
+      cursor: pointer;
+      transform-style: preserve-3d;
+    }
+    .layer img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(0,255,255,0.15));
+      transition: filter 0.3s ease;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .layer:hover img {
+      filter: drop-shadow(0 0 24px rgba(0,255,255,0.6));
+    }
+    .layer.flashed img {
+      filter: drop-shadow(0 0 40px rgba(255,255,255,0.9)) brightness(1.5);
+    }
+
+    /* ─── Battery SVG layer ─── */
+    .battery-svg {
+      width: 180px;
+      height: 100px;
+      filter: drop-shadow(0 0 8px rgba(255,200,0,0.3));
+      transition: filter 0.3s ease;
+    }
+    .layer:hover .battery-svg {
+      filter: drop-shadow(0 0 24px rgba(255,200,0,0.7));
+    }
+
+    /* ─── HUD Labels ─── */
+    .hud-label {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      background: rgba(0,255,255,0.05);
+      border: 1px solid rgba(0,255,255,0.2);
+      border-radius: 2px;
+      pointer-events: none;
+      opacity: 0;
+      white-space: nowrap;
+      transition: opacity 0.3s ease;
+    }
+    .layer:hover .hud-label { opacity: 1; }
+
+    /* ─── Info Panel ─── */
+    .info-panel {
+      position: fixed;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%) translateX(30px);
+      width: 320px;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .info-panel.visible {
+      opacity: 1;
+      transform: translateY(-50%) translateX(0);
+      pointer-events: auto;
+    }
+    .info-panel .close-btn {
+      position: absolute;
+      top: 12px; right: 12px;
+      background: none; border: none;
+      color: var(--text-muted); font-size: 1.2rem;
+      cursor: pointer; line-height: 1;
+    }
+    .info-panel .close-btn:hover { color: var(--accent); }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.78rem;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--text-muted); }
+    .spec-val { color: var(--accent); font-family: var(--font-mono); font-size: 0.72rem; }
+
+    /* ─── Scroll Progress ─── */
+    .scroll-hint {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 100;
+      transition: opacity 0.5s ease;
+    }
+    .scroll-hint.hidden { opacity: 0; pointer-events: none; }
+    .scroll-text {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .scroll-arrow {
+      width: 20px; height: 20px;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(45deg);
+      animation: bounceDown 1.4s ease infinite;
+    }
+    @keyframes bounceDown {
+      0%,100% { transform: rotate(45deg) translateY(0); }
+      50% { transform: rotate(45deg) translateY(6px); }
+    }
+
+    /* ─── Part counter ─── */
+    .dissection-progress {
+      position: fixed;
+      left: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .prog-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0.3;
+      transition: opacity 0.4s ease;
+      cursor: pointer;
+    }
+    .prog-item.active { opacity: 1; }
+    .prog-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.3s ease;
+    }
+    .prog-item.active .prog-dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+    .prog-name {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+    .prog-item.active .prog-name { color: var(--accent); }
+
+    /* ─── Phase title ─── */
+    .phase-title {
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .phase-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--accent);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .phase-name {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      transition: all 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Anatomy</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">The Bench</a></li>
+      <li><a href="academy.html">Academy</a></li>
+      <li><a href="anatomy.html" class="active">Anatomy</a></li>
+      <li><a href="blueprint.html">Blueprint</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="pid.html">PID Tuning</a></li>
+      <li><a href="handbook.html">Handbook</a></li>
+      <li><a href="platforms.html">Platforms</a></li>
+      <li><a href="tools.html">RF Tools</a></li>
+      <li><a href="ops.html">Ops Center</a></li>
+      <li><a href="builder.html">Builder</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle nav">☰</button>
+  </div></nav>
+
+  <!-- Phase Title (updates on scroll) -->
+  <div class="phase-title">
+    <div class="phase-label" id="phaseLabel">SCROLL TO BEGIN</div>
+    <div class="phase-name" id="phaseName">FPV Dissection</div>
+  </div>
+
+  <!-- Left sidebar: dissection progress -->
+  <div class="dissection-progress" id="dissectionProgress">
+    <div class="prog-item active" data-idx="0" onclick="focusPart(0)">
+      <div class="prog-dot"></div><span class="prog-name">FRAME</span>
+    </div>
+    <div class="prog-item" data-idx="1" onclick="focusPart(1)">
+      <div class="prog-dot"></div><span class="prog-name">BATTERY</span>
+    </div>
+    <div class="prog-item" data-idx="2" onclick="focusPart(2)">
+      <div class="prog-dot"></div><span class="prog-name">STACK</span>
+    </div>
+    <div class="prog-item" data-idx="3" onclick="focusPart(3)">
+      <div class="prog-dot"></div><span class="prog-name">MOTORS</span>
+    </div>
+    <div class="prog-item" data-idx="4" onclick="focusPart(4)">
+      <div class="prog-dot"></div><span class="prog-name">CAMERA / VTX</span>
+    </div>
+    <div class="prog-item" data-idx="5" onclick="focusPart(5)">
+      <div class="prog-dot"></div><span class="prog-name">PROPS</span>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint" id="scrollHint">
+    <span class="scroll-text">Scroll to Dissect</span>
+    <div class="scroll-arrow"></div>
+  </div>
+
+  <!-- Main scrollytelling area -->
+  <div class="anatomy-wrapper">
+    <div class="sticky-scene">
+      <div class="holo-grid"></div>
+
+      <!-- The Drone Stack -->
+      <div class="drone-stage" id="droneStage">
+
+        <!-- Layer 0: Frame (base, stays at z=0) -->
+        <div class="layer" id="layer-frame" onclick="openPanel('frame')">
+          <img src="assets/components/frame.png" alt="Carbon Fiber Frame" loading="eager">
+          <div class="hud-label" style="left:-140px; top:50%;">CARBON FRAME →</div>
+        </div>
+
+        <!-- Layer 1: Battery (sits below on z-axis) -->
+        <div class="layer" id="layer-battery" onclick="openPanel('battery')">
+          <svg class="battery-svg" viewBox="0 0 200 100">
+            <rect x="2" y="10" width="185" height="80" rx="6" fill="#1a1a2e" stroke="#FFD700" stroke-width="1.5"/>
+            <rect x="187" y="30" width="10" height="40" rx="2" fill="#FFD700"/>
+            <rect x="10" y="18" width="80" height="64" rx="3" fill="#0d47a1" opacity="0.8"/>
+            <rect x="98" y="18" width="80" height="64" rx="3" fill="#0d47a1" opacity="0.8"/>
+            <text x="50" y="57" fill="#FFD700" font-size="10" font-family="monospace" text-anchor="middle">6S</text>
+            <text x="138" y="57" fill="#FFD700" font-size="10" font-family="monospace" text-anchor="middle">1300mAh</text>
+            <circle cx="30" cy="85" r="5" fill="#e53935"/>
+            <circle cx="44" cy="85" r="5" fill="#111"/>
+          </svg>
+          <div class="hud-label" style="left:-120px; top:55%;">6S LiPo →</div>
+        </div>
+
+        <!-- Layer 2: Stack (FC + ESC) -->
+        <div class="layer" id="layer-stack" onclick="openPanel('stack')">
+          <img src="assets/components/stack.png" alt="FC/ESC Stack" loading="eager" style="width:40%; height:40%;">
+          <div class="hud-label" style="right:-120px; top:50%;">← FC/ESC CORE</div>
+        </div>
+
+        <!-- Layer 3: Motors -->
+        <div class="layer" id="layer-motors" onclick="openPanel('motors')">
+          <img src="assets/components/motors.png" alt="Brushless Motors" loading="eager">
+          <div class="hud-label" style="right:-140px; top:45%;">← ACTUATORS</div>
+        </div>
+
+        <!-- Layer 4: Camera / VTX -->
+        <div class="layer" id="layer-camera" onclick="openPanel('camera')">
+          <img src="assets/components/camera.png" alt="Camera & VTX" loading="eager" style="width:30%; height:30%; position:absolute; top:10%; left:35%;">
+          <div class="hud-label" style="left:-110px; top:18%;">OPTICAL LINK →</div>
+        </div>
+
+        <!-- Layer 5: Props (topmost) -->
+        <div class="layer" id="layer-props" onclick="openPanel('props')">
+          <img src="assets/components/props.png" alt="Propellers" loading="eager">
+          <div class="hud-label" style="left:-120px; top:40%;">THRUST SURFS →</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Panel -->
+  <div class="info-panel glass" id="infoPanel" style="padding:28px; border:1px solid var(--accent);">
+    <button class="close-btn" onclick="closePanel()">✕</button>
+    <div style="font-family:var(--font-mono); font-size:0.55rem; color:var(--accent); letter-spacing:0.2em; margin-bottom:8px;" id="panelTag">COMPONENT</div>
+    <h2 style="font-size:1.3rem; margin-bottom:8px; color:var(--text);" id="panelTitle">Title</h2>
+    <p style="font-size:0.82rem; color:var(--text-dim); line-height:1.65; margin-bottom:20px;" id="panelDesc">Description</p>
+    <div id="panelSpecs"></div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/anatomy.js"></script>
+</body>
+</html>

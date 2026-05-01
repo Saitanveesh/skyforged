@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Drone Integration Handbook — RF, Firmware, Field Ops</title>
+  <title>SkyForged / Handbook — The Drone Integration Handbook</title>
+  <meta name="description" content="A practical reference for drone systems integration and operations in India. Focused on DGCA Type Certification and Digital Sky compliance.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Handbook</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">The Bench</a></li>
+      <li><a href="academy.html">Academy</a></li>
+      <li><a href="anatomy.html">Anatomy</a></li>
+      <li><a href="blueprint.html">Blueprint</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="pid.html">PID Tuning</a></li>
+      <li><a href="handbook.html" class="active">Handbook</a></li>
+      <li><a href="platforms.html">Platforms</a></li>
+      <li><a href="tools.html">RF Tools</a></li>
+      <li><a href="ops.html">Ops Center</a></li>
+      <li><a href="builder.html">Builder</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+  </div></nav>
+
+  <div class="progress-bar" id="progressBar"></div>
+
+  <div class="search-overlay" id="searchOverlay">
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search handbook...">
+        <span class="search-kbd">ESC</span>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="container">
+
+      <!-- Handbook Header -->
+      <div style="text-align:center;margin-bottom:60px;">
+        <h1 style="font-family:var(--font-mono);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin-bottom:12px;">The Drone Integration Handbook</h1>
+        <p style="color:var(--text-dim);font-size:1rem;max-width:640px;margin:0 auto 16px;">Proprietary platform. No login required. A practical reference for anyone integrating, operating, or troubleshooting multi-platform drone systems in India. Made by Sai Tanveesh.</p>
+        <p style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);">CC BY-SA 4.0 · v1.0 · <a href="#">Source on GitHub</a></p>
+        <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
+          <button class="btn btn-sm" onclick="document.getElementById('tocSidebar').classList.toggle('mobile-open')">☰ Contents</button>
+          <button class="btn btn-sm" onclick="toggleSearch()">⌘K Search</button>
+        </div>
+      </div>
+
+      <div class="handbook-layout">
+        <!-- Table of Contents -->
+        <aside class="toc" id="tocSidebar">
+          <div class="toc-part">
+            <div class="toc-part-title">Part 1 — RF Fundamentals</div>
+            <a href="#ch1" class="toc-link"><span class="num">1</span>The Five Link Types</a>
+            <a href="#ch2" class="toc-link"><span class="num">2</span>Frequency Bands & Regulatory Reality</a>
+            <a href="#ch3" class="toc-link"><span class="num">3</span>Antennas for People Who Aren't RF Engineers</a>
+            <a href="#ch4" class="toc-link"><span class="num">4</span>Link Budgets Without the Math</a>
+          </div>
+          <div class="toc-part">
+            <div class="toc-part-title">Part 2 — Flight Controller Firmware</div>
+            <a href="#ch5" class="toc-link"><span class="num">5</span>The Four Firmwares</a>
+            <a href="#ch6" class="toc-link"><span class="num">6</span>MSP Protocol</a>
+            <a href="#ch7" class="toc-link"><span class="num">7</span>MAVLink Protocol</a>
+            <a href="#ch8" class="toc-link"><span class="num">8</span>UART Layout</a>
+          </div>
+          <div class="toc-part">
+            <div class="toc-part-title">Part 3 — Field Operations</div>
+            <a href="#ch9" class="toc-link"><span class="num">9</span>Pre-Flight Checklist</a>
+            <a href="#ch10" class="toc-link"><span class="num">10</span>Blackbox Logs</a>
+            <a href="#ch11" class="toc-link"><span class="num">11</span>PID Tuning</a>
+            <a href="#ch12" class="toc-link"><span class="num">12</span>When Things Go Wrong</a>
+          </div>
+          <div class="toc-part">
+            <div class="toc-part-title">Part 4 — Integration</div>
+            <a href="#ch13" class="toc-link"><span class="num">13</span>Companion Computers</a>
+            <a href="#ch14" class="toc-link"><span class="num">14</span>Mesh Radios</a>
+            <a href="#ch15" class="toc-link"><span class="num">15</span>TAK Integration</a>
+          </div>
+          <div class="toc-part">
+            <div class="toc-part-title">What's Left to Solve</div>
+            <a href="#ch16" class="toc-link"><span class="num">16</span>Unsolved Problems</a>
+          </div>
+        </aside>
+
+        <!-- Content -->
+        <main>
+          <!-- CH1 -->
+          <div class="chapter" id="ch1">
+            <span class="chapter-number">Chapter 1</span>
+            <h2 class="chapter-title">The Five Link Types</h2>
+            <p class="chapter-intro">Every drone in the air right now is using between one and five simultaneous radio links. Most operators can name two. This chapter covers all five.</p>
+            <p>A racing quad has two links — RC control and video. Simple. But the moment you add GPS return-to-home, you've added a third (telemetry). Add a companion computer with a mesh radio and you're at four. Add a payload camera with its own downlink and you're at five.</p>
+            <p>Each link has its own frequency, its own protocol, its own antenna, its own failure mode, and its own opinion about which direction the drone should go. When they disagree, things get interesting.</p>
+
+            <h3>Link 1: Manual Control (RC)</h3>
+            <p>Carries stick commands from the pilot to the flight controller. The link that keeps a human in the loop.</p>
+            <p><strong>Protocols:</strong> ELRS (ExpressLRS), CRSF (TBS Crossfire), GHST (IRC Ghost), SBUS (FrSky), IBUS (FlySky), PPM (legacy).</p>
+            <p><strong>Frequencies:</strong> 2.4 GHz (most common), 900/868 MHz (long range), Sub-GHz proprietary (tactical).</p>
+            <div class="callout"><div class="callout-title">Key Insight</div><p>This is the only link where latency matters in milliseconds. ELRS at 500 Hz has ~2 ms latency. Loss of this link triggers failsafe — know yours before you need it.</p></div>
+
+            <h3>Link 2: Telemetry / Command & Control (C2)</h3>
+            <p>Bidirectional data link between the drone and a ground station. Carries flight data down (position, battery, attitude) and commands up (waypoints, parameter changes).</p>
+            <p><strong>Protocols:</strong> MAVLink v2 (ArduPilot, PX4), MSP (Betaflight, iNav), LTM, FrSky S.Port/F.Port.</p>
+
+            <h3>Link 3: Video Downlink</h3>
+            <p>Sends camera feed from the drone to the pilot's goggles or ground station. Technologies include analog 5.8 GHz (~1 ms latency), DJI digital (~20-28 ms), HDZero (~15 ms), and OpenHD/WFB-ng (~80-120 ms).</p>
+
+            <h3>Link 4: Payload Data</h3>
+            <p>Carries data from mission payloads — mapping cameras, LiDAR, SIGINT receivers. Usually high bandwidth, latency tolerant.</p>
+
+            <h3>Link 5: Drone-to-Drone (Mesh)</h3>
+            <p>Drone-to-drone communication for fleet operations. Technologies include ESP-NOW (short range), WiFi mesh (batman-adv), and MANET (military-grade).</p>
+
+            <div class="callout warn"><div class="callout-title">Remember</div><p>Not every drone needs all five links. More links = more complexity = more failure modes. Add links because the mission requires them, not because the hardware supports them.</p></div>
+          </div>
+
+          <!-- CH2 -->
+          <div class="chapter" id="ch2">
+            <span class="chapter-number">Chapter 2</span>
+            <h2 class="chapter-title">Frequency Bands & Regulatory Reality</h2>
+            <p class="chapter-intro">The regulations tell you what you're allowed to do. The physics tell you what will actually work. They don't always agree.</p>
+
+            <h3>900 MHz (902–928 MHz US, 868 MHz EU)</h3>
+            <p>Sub-GHz propagation is king. 900 MHz bends around obstacles, penetrates foliage, and reaches farther per milliwatt than any other band you'll use. A 100 mW ELRS 900 link will outrange a 1 W 2.4 GHz link in most real-world environments.</p>
+
+            <h3>2.4 GHz (2400–2483.5 MHz)</h3>
+            <p>The default for everything — globally harmonized, license-free, and supported by every chip on the market. Also the most crowded band in existence.</p>
+
+            <h3>5.8 GHz (5725–5875 MHz)</h3>
+            <p>The FPV video band. Higher path loss than 2.4 GHz (~7.7 dB more at the same distance), but enough bandwidth for video. EU limit is 25 mW EIRP — most VTX modules shipped into the EU are technically non-compliant above that.</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Band</th><th>Range/mW</th><th>Penetration</th><th>Bandwidth</th><th>Crowding</th></tr></thead>
+                <tbody>
+                  <tr><td class="highlight">900 MHz</td><td>Best</td><td>Best</td><td>Low</td><td>Moderate</td></tr>
+                  <tr><td class="highlight">2.4 GHz</td><td>Good</td><td>Good</td><td>Medium</td><td>Severe</td></tr>
+                  <tr><td class="highlight">5.8 GHz</td><td>Moderate</td><td>Poor</td><td>High</td><td>High</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- CH3 -->
+          <div class="chapter" id="ch3">
+            <span class="chapter-number">Chapter 3</span>
+            <h2 class="chapter-title">Antennas for People Who Aren't RF Engineers</h2>
+            <p class="chapter-intro">The antenna is the most important and least understood component on your drone. A $200 radio with a bad antenna loses to a $30 radio with a good one.</p>
+            <p><strong>The One Rule:</strong> Match your antenna to your link. Everything else in this chapter is explaining what that means.</p>
+
+            <h3>Antenna Types</h3>
+            <p><strong>Dipole / Whip:</strong> Donut-shaped pattern. 2–5 dBi. Default choice when you don't know which direction the other radio will be.</p>
+            <p><strong>Patch:</strong> Directional — strong in front, weak behind. 6–14 dBi. Use on ground stations.</p>
+            <p><strong>Helical:</strong> Focused beam, 8–15+ dBi. For ground station trackers.</p>
+            <p><strong>Pagoda / Lollipop:</strong> Compact circular-polarized. 1–3 dBi. Standard FPV video antenna.</p>
+
+            <div class="callout"><div class="callout-title">Range Shortcut</div><p>Start with manufacturer's claimed range. Divide by 3. That's your real-world range with obstacles, interference, and non-ideal antenna placement.</p></div>
+          </div>
+
+          <!-- CH4 -->
+          <div class="chapter" id="ch4">
+            <span class="chapter-number">Chapter 4</span>
+            <h2 class="chapter-title">Link Budgets Without the Math</h2>
+            <p class="chapter-intro">A link budget tells you whether your radio link will work at a given distance. You don't need a calculator — you need to understand three numbers.</p>
+
+            <h3>The Three Numbers</h3>
+            <p><strong>1. Transmit Power</strong> — How loud you're shouting. Doubling power only gets ~40% more range.</p>
+            <p><strong>2. Receiver Sensitivity</strong> — How well you can hear a whisper. Improves when you lower data rate.</p>
+            <p><strong>3. Link Margin</strong> — How much room before it breaks. 10 dB = fragile, 20 dB = solid, 30 dB+ = robust.</p>
+
+            <h3>The Three Killers</h3>
+            <p><strong>Distance:</strong> Signal drops 6 dB every time you double distance (¼ power).</p>
+            <p><strong>Obstacles:</strong> Trees cost 6-10 dB, buildings 10-20 dB, terrain is a wall.</p>
+            <p><strong>Interference:</strong> Every other radio on your frequency raises the noise floor.</p>
+
+            <div class="callout"><div class="callout-title">Try the Calculator</div><p>Use the <a href="tools.html#range-estimator">Range Estimator</a> tool to calculate link budgets for your specific setup.</p></div>
+          </div>
+
+          <!-- CH5 -->
+          <div class="chapter" id="ch5">
+            <span class="chapter-number">Chapter 5</span>
+            <h2 class="chapter-title">The Four Firmwares</h2>
+            <p class="chapter-intro">Betaflight, iNav, ArduPilot, PX4 — all open-source, all run on STM32 FCs, all actively developed. None of them are going away.</p>
+
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Firmware</th><th>Best For</th><th>Protocol</th><th>Autonomy</th><th>Params</th></tr></thead>
+                <tbody>
+                  <tr><td class="highlight">Betaflight</td><td>Acrobatic FPV</td><td>MSP v2</td><td>None</td><td>~400</td></tr>
+                  <tr><td class="highlight">iNav</td><td>GPS Nav + FPV</td><td>MSP v2+</td><td>Waypoints</td><td>~600</td></tr>
+                  <tr><td class="highlight">ArduPilot</td><td>Full autonomy</td><td>MAVLink v2</td><td>Full</td><td>~1,200</td></tr>
+                  <tr><td class="highlight">PX4</td><td>Research / ROS2</td><td>MAVLink v2</td><td>Full</td><td>~900</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The FPV world runs Betaflight and iNav (MSP protocol). The autonomous world runs ArduPilot and PX4 (MAVLink). These worlds are converging.</p>
+          </div>
+
+          <!-- CH6 -->
+          <div class="chapter" id="ch6">
+            <span class="chapter-number">Chapter 6</span>
+            <h2 class="chapter-title">MSP Protocol</h2>
+            <p class="chapter-intro">MSP is a question-and-answer protocol. You ask the FC a question. It answers. No streaming, no subscriptions, no surprises.</p>
+            <p>MSP (MultiWii Serial Protocol) runs over any serial connection at any baud rate. There are no handshakes, no sessions, no state. Send a request, get a response.</p>
+
+            <h3>MSP v2 Packet Format</h3>
+            <pre><code>Request:  $ X < flag func_id[16] size[16] payload... crc8
+Response: $ X > flag func_id[16] size[16] payload... crc8</code></pre>
+
+            <h3>Write Safety Pattern</h3>
+            <ol>
+              <li>Read the current value (snapshot before)</li>
+              <li>Show the diff to the operator</li>
+              <li>Get approval</li>
+              <li>Write the new value via MSP_SET_*</li>
+              <li>Read back to verify the FC accepted it</li>
+              <li>EEPROM write after all changes in the batch</li>
+            </ol>
+          </div>
+
+          <!-- CH7 -->
+          <div class="chapter" id="ch7">
+            <span class="chapter-number">Chapter 7</span>
+            <h2 class="chapter-title">MAVLink Protocol</h2>
+            <p class="chapter-intro">MAVLink is a publish-subscribe protocol. You tell the FC what streams you want and it sends them continuously.</p>
+            <p>Every device has a system ID (1-254) and component ID. In a swarm, each drone must have a unique system ID — if two match, you can't tell them apart.</p>
+
+            <h3>HEARTBEAT — The Keepalive</h3>
+            <p>Every MAVLink device sends HEARTBEAT at 1 Hz. No heartbeat for >5 seconds = dead link.</p>
+
+            <h3>Key Stream Rates (ArduPilot)</h3>
+            <pre><code>SR0_POSITION=2    # GPS position at 2 Hz
+SR0_EXTRA1=4      # Attitude at 4 Hz
+SR0_EXTRA2=2      # VFR HUD at 2 Hz
+SR0_RAW_SENS=1    # Raw sensors at 1 Hz
+SR0_RC_CHAN=5      # RC channels at 5 Hz</code></pre>
+          </div>
+
+          <!-- CH8 -->
+          <div class="chapter" id="ch8">
+            <span class="chapter-number">Chapter 8</span>
+            <h2 class="chapter-title">UART Layout and Why It Matters</h2>
+            <p class="chapter-intro">A typical F405 flight controller has 3-6 UARTs. They get consumed fast.</p>
+            <p>Common allocation: UART1 → MSP/Config, UART2 → CRSF Receiver, UART3 → GPS, UART4 → Telemetry, UART5 → ESC Telemetry, UART6 → VTX SmartAudio.</p>
+            <p>Running out of UARTs is the most common integration problem on F4-class FCs. Solutions: use soft serial (limited baud), upgrade to H7 (more UARTs), or use a companion computer to multiplex.</p>
+          </div>
+
+          <!-- CH9 -->
+          <div class="chapter" id="ch9">
+            <span class="chapter-number">Chapter 9</span>
+            <h2 class="chapter-title">Pre-Flight Checklist That Actually Works</h2>
+            <p class="chapter-intro">Not the manufacturer's marketing checklist. The one that catches the problems that ground you.</p>
+            <ol>
+              <li><strong>Visual inspect:</strong> Props tight, no cracks. Arms secure. No loose wires.</li>
+              <li><strong>Battery:</strong> Voltage above 3.7V/cell. Balance within 0.05V. No puffing.</li>
+              <li><strong>FC boot:</strong> Accelerometer level. Gyro settled. No errors in OSD.</li>
+              <li><strong>GPS lock:</strong> Minimum 8 sats. HDOP < 2.0. Wait for 3D fix.</li>
+              <li><strong>RC link:</strong> All channels responding. Failsafe configured and tested.</li>
+              <li><strong>Video:</strong> Clean image, correct channel, reasonable VTX power.</li>
+              <li><strong>Motor direction:</strong> Spin test without props if any changes were made.</li>
+              <li><strong>Arm test:</strong> Arm, verify motors spin, disarm immediately.</li>
+            </ol>
+          </div>
+
+          <!-- CH10 -->
+          <div class="chapter" id="ch10">
+            <span class="chapter-number">Chapter 10</span>
+            <h2 class="chapter-title">Blackbox Logs</h2>
+            <p class="chapter-intro">Blackbox logs are the flight data recorder of FPV. They tell you what happened and why.</p>
+            <p>Key patterns to look for: <strong>P-term oscillation</strong> (too much P gain), <strong>D-term noise</strong> (need filtering), <strong>Motor saturation</strong> (hitting 100% throttle), <strong>I-term windup</strong> (integrator accumulating during flips), <strong>Voltage sag</strong> (battery can't deliver current).</p>
+          </div>
+
+          <!-- CH11 -->
+          <div class="chapter" id="ch11">
+            <span class="chapter-number">Chapter 11</span>
+            <h2 class="chapter-title">PID Tuning for People Who Fly</h2>
+            <p class="chapter-intro">What P, I, and D actually do to your quad, how to read the symptoms, and a tuning workflow that works at the field.</p>
+            <p><strong>P (Proportional):</strong> How hard the FC corrects errors. Too high = oscillation. Too low = mushy feel.</p>
+            <p><strong>I (Integral):</strong> How the FC eliminates steady-state errors. Too high = slow oscillation/bounce-back. Too low = drifts in wind.</p>
+            <p><strong>D (Derivative):</strong> How the FC dampens P's corrections. Too high = hot motors, vibrations. Too low = overshoot on stops.</p>
+          </div>
+
+          <!-- CH12 -->
+          <div class="chapter" id="ch12">
+            <span class="chapter-number">Chapter 12</span>
+            <h2 class="chapter-title">When Things Go Wrong</h2>
+            <p class="chapter-intro">The diagnostic tree. Start here when something breaks.</p>
+            <h3>Won't Arm</h3>
+            <p>Check: accelerometer calibration, switch position, throttle not at zero, gyro not settled, USB connected (disables arming on some FCs).</p>
+            <h3>Flyaway</h3>
+            <p>Check: GPS mode with bad fix, compass interference (mount away from power wires), motor direction reversed.</p>
+            <h3>Video Loss</h3>
+            <p>Check: VTX antenna connected, correct channel, VTX not overheating, 5.8 GHz interference from other sources.</p>
+            <h3>Failsafe</h3>
+            <p>Check: RC link quality (RSSI/LQ), antenna orientation, frequency conflict with other on-board transmitters.</p>
+          </div>
+
+          <!-- CH13 -->
+          <div class="chapter" id="ch13">
+            <span class="chapter-number">Chapter 13</span>
+            <h2 class="chapter-title">Adding a Companion Computer</h2>
+            <p class="chapter-intro">When you need more than an FC. VOXL 2, Jetson, Pi — what connects where and what protocols to use.</p>
+            <p>A companion computer sits between the flight controller and the outside world. It runs Linux, connects to the FC via serial (MAVLink or MSP), and provides capabilities the FC can't: computer vision, mesh networking, cellular uplinks, payload control, and AI inference.</p>
+            <p><strong>Power budget:</strong> Raspberry Pi 4 draws 3-5W. Jetson Orin Nano draws 7-15W. VOXL 2 draws 4-6W. On a 1300 mAh 6S quad, this significantly impacts flight time.</p>
+          </div>
+
+          <!-- CH14 -->
+          <div class="chapter" id="ch14">
+            <span class="chapter-number">Chapter 14</span>
+            <h2 class="chapter-title">Mesh Radios for Multi-Vehicle</h2>
+            <p class="chapter-intro">Doodle Labs, Silvus, Persistent Systems — what they actually are (hint: OpenWRT + batman-adv), and the real-world range you'll get.</p>
+            <p>The dirty secret: Doodle Labs is OpenWRT on Qualcomm WiFi silicon running batman-adv. Silvus is similar with their own MAC layer. They're not magic — they're well-engineered WiFi radios in ruggedized enclosures with good antenna design and custom firmware.</p>
+            <p>Real throughput across 3 hops is typically 30-50% of single-hop throughput. "50 km range" claims are radio range, not mesh range.</p>
+          </div>
+
+          <!-- CH15 -->
+          <div class="chapter" id="ch15">
+            <span class="chapter-number">Chapter 15</span>
+            <h2 class="chapter-title">TAK Integration</h2>
+            <p class="chapter-intro">Cursor-on-Target, ATAK, WinTAK — how to get your drone onto the common operating picture without a defense contractor.</p>
+            <p>TAK (Team Awareness Kit) is the US military's situational awareness platform. ATAK (Android) and WinTAK (Windows) display a shared map with all friendly forces. Getting your drone's position onto that map requires generating <strong>Cursor-on-Target (CoT)</strong> XML messages and sending them to a TAK server.</p>
+            <p>A companion computer running a MAVLink-to-CoT bridge can put your drone on the TAK map in real time. MAVLink GLOBAL_POSITION_INT → CoT a-f-A (friendly, airborne) at 1-2 Hz.</p>
+          </div>
+
+          <!-- CH16 -->
+          <div class="chapter" id="ch16">
+            <span class="chapter-number">Chapter 16</span>
+            <h2 class="chapter-title">Unsolved Problems</h2>
+            <p class="chapter-intro">The hard problems that don't have good solutions yet.</p>
+            <ol>
+              <li><strong>Spectrum deconfliction at scale:</strong> 20 drones in the same area, each with 3-5 RF links. No automated solution exists.</li>
+              <li><strong>GPS-denied navigation:</strong> Visual-inertial odometry works indoors. Outdoors at speed with wind? Hard.</li>
+              <li><strong>Anti-jamming on ISM bands:</strong> You can't frequency-hop if you're using commodity WiFi silicon.</li>
+              <li><strong>Multi-vendor fleet management:</strong> DJI, Skydio, ArduPilot, and PX4 drones on the same GCS. Nobody does this well.</li>
+              <li><strong>Regulatory harmonization:</strong> 900 MHz works in the US, not in the EU. No fix coming.</li>
+              <li><strong>Open-source digital video:</strong> The RTL8812AU is discontinued. OpenHD needs new silicon.</li>
+            </ol>
+            <div class="callout"><div class="callout-title">The Handbook</div><p>If you have solutions, field data, or corrections — contributions are welcome. File a PR on GitHub. The only rules: be accurate, be practical, no marketing.</p></div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer" style="position:relative;z-index:2;background:var(--bg);">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="tools.html">Tools</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="platforms.html">Platforms</a>
+      <a href="builder.html">Builder</a>
+      <a href="#">GitHub</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/handbook.js"></script>
+</body>
+</html>

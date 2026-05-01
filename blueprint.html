@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / The Blueprint</title>
+  <meta name="description" content="Component selection logic and pre-calculation math for drone builds. Made by Sai Tanveesh.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📐</text></svg>">
+  <style>
+    .math-callout {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid var(--accent);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      color: var(--accent);
+      margin: 16px 0;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ The Blueprint</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">The Bench</a></li>
+        <li><a href="academy.html">Academy</a></li>
+        <li><a href="anatomy.html">Anatomy</a></li>
+        <li><a href="blueprint.html" class="active">Blueprint</a></li>
+        <li><a href="maps.html">Maps</a></li>
+        <li><a href="pid.html">PID Tuning</a></li>
+        <li><a href="handbook.html">Handbook</a></li>
+        <li><a href="platforms.html">Platforms</a></li>
+        <li><a href="tools.html">RF Tools</a></li>
+        <li><a href="ops.html">Ops Center</a></li>
+        <li><a href="builder.html">Builder</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+    </div>
+  </nav>
+
+  <div class="page-body">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:80px;">
+        <div class="brand-powered" style="color:var(--accent);font-size:0.7rem;font-weight:700;letter-spacing:0.2em;margin-bottom:12px;text-transform:uppercase;">PRE-BUILD PREPARATION</div>
+        <h1 class="hero-title" style="font-size:clamp(2rem,5vw,3.5rem);">The <span class="text-gradient">Blueprint</span></h1>
+        <p style="color:var(--text-dim);font-size:1.1rem;max-width:720px;margin:0 auto;">Before you buy a single part or open the Model Builder, you must run the math. Welcome to the component selection formulas, analytical logic, and constraints.</p>
+        <div style="margin-top:24px;">
+            <a href="builder.html" class="btn btn-sm btn-primary">Go to Model Builder →</a>
+        </div>
+      </div>
+
+      <!-- Section 1: Motors & Propellers -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">1. Motor & Propeller Mathematics (Thrust Strategy)</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <p style="margin-bottom:24px;color:var(--text-dim);">Your motors dictate the personality of your drone. You select them based on your desired Thrust-to-Weight ratio and required RPM.</p>
+          
+          <h3 style="color:var(--accent-alt);margin-bottom:8px;">The Thrust-to-Weight Ratio</h3>
+          <p>For acrobatic freestyle flight, you want a <strong>5:1 ratio</strong>. If your drone weighs 700g (with LiPo + GoPro), you need 3,500g of total thrust. That means each motor must produce 875g of thrust at 100% throttle. Refer to thrust tables provided by motor manufacturers before buying.</p>
+
+          <h3 style="color:var(--accent-alt);margin-bottom:8px;margin-top:24px;">Stator Volume: Decoding "2207" vs "2306"</h3>
+          <p>A motor labeled "2207" means the stator applies 22mm of width and 7mm of height.<br>
+          - <strong>Taller stators (e.g., 2207, 2208):</strong> Provide more torque at higher RPMs. Best for top-end speed.<br>
+          - <strong>Wider stators (e.g., 2306, 2806):</strong> Provide more low-end torque. Better for "grippy" feeling or carrying heavy cinematic cameras.</p>
+
+          <h3 style="color:var(--accent-alt);margin-bottom:8px;margin-top:24px;">KV & Voltage Rules</h3>
+          <p>KV represents RPM per Volt. If you run a high KV motor on a high voltage battery, your props will spin too fast, draw excessive amps, and burn out the ESC.</p>
+          <div class="math-callout">
+            KV × Battery Nominal Voltage = Target RPM at 100% Throttle (No Load)
+          </div>
+          <p style="font-size:0.9rem;color:var(--text-dim);"><em>Example:</em> A standard 5-inch 6S quad runs at ~39,000 RPM.<br>1750KV × 22.2V (6S) = 38,850 RPM.<br>Do not run a 2400KV motor on 6S unless you severely limit throttle output in Betaflight!</p>
+
+          <h3 style="color:var(--accent-alt);margin-bottom:8px;margin-top:24px;">Propeller Pitch Math</h3>
+          <p>Propellers are coded as a 5-digit number, e.g., <strong>51433</strong>.</p>
+          <ul style="color:var(--text-dim);margin-left:20px;">
+            <li><strong>51:</strong> 5.1 inch diameter.</li>
+            <li><strong>43:</strong> 4.3 inch pitch (how far forward it travels in one rotation).</li>
+            <li><strong>3:</strong> 3 blades (tri-blade).</li>
+          </ul>
+          <p><strong>The Golden Rule:</strong> Higher pitch (e.g., 4.3+ vs 3.0) gives more top speed but acts like a higher gear in a car, pulling drastically more Amperage and draining batteries faster.</p>
+        </div>
+      </section>
+
+      <!-- Section 2: Electronic Speed Controllers (ESCs) -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">2. ESC Selection (Amp Rating Logic)</h2>
+        <div class="cards-grid">
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Amp Rating Calculation</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">To choose your ESC, look at the max Amp draw of your chosen motor on your chosen prop. If a 2207 pulls 38A at 100% throttle, do not buy a 40A ESC. <strong>Always add a 20% safety margin.</strong> 38A × 1.2 = 45A. You should buy a 50A ESC.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">DShot Protocols</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">ESCs speak to Flight Controllers digitally using DShot. <strong>DShot300</strong> runs at 300,000 bits/sec. <strong>DShot600</strong> runs at 600,000. DShot300 is perfectly fine and often cleaner for an 8K/4K looptime on an F4 processor. Don't chase DShot600 unnecessarily.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Filtering: Capacitors</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Every 4-in-1 ESC running on 6S <strong>must</strong> have a Low ESR Capacitor soldered to the power leads (typically 1000uF 35V). This absorbs voltage spikes from the motors and protects your VTX from frying.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Flight Controller (FC) Pre-Calc -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">3. Flight Controller Strategy</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Processor Speed (F4 vs F7 vs H7)</h3>
+                <p><strong>F405:</strong> Legacy but highly capable. May struggle if running RPM filtering + GPS + high loop times simultaneously.<br><strong>F722:</strong> The modern sweet spot. Built-in signal inversion for all UARTs. Plenty of processing power.<br><strong>H743:</strong> Extreme power, mostly needed for sophisticated ArduPilot autonomous navigation or complex Lua scripts.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">UART Counting (Crucial Pre-Purchase Step)</h3>
+                <p>Before buying an FC, list every peripheral you intend to use. An F405 usually has 4-5 UARTs, but they run out fast:</p>
+                <ul style="color:var(--text-dim);margin-left:20px;">
+                  <li>UART 1: ExpressLRS Receiver</li>
+                  <li>UART 2: DJI Digital VTX / HDZero</li>
+                  <li>UART 3: GPS Module</li>
+                  <li>UART 4: ESC Telemetry</li>
+                  <li>UART 5: Compass (usually goes on I2C but needs pads)</li>
+                </ul>
+                <p>Ensure the FC specifies enough <strong>Hardware UARTs</strong>.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Gyroscope Chips</h3>
+                <p>The BMI270 requires software filtering in Betaflight. The MPU6000 is legendary for being "cleaner" regarding electrical noise, making it easier to tune. Due to chip shortages, check what gyro is actually on the board.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Battery Limits -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">4. Battery Safe-Draw Math</h2>
+        <p style="color:var(--text-dim);margin-bottom:32px;">If you try to pull 150 Amps out of a battery that can only deliver 100 Amps, the voltage will violently "sag", your video will black out, and your battery will puff up permanently.</p>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <div class="math-callout">
+             Max Continuous Amps = Capacity (in Amp Hours) × True C-Rating
+          </div>
+          <p style="margin-top:16px;"><strong>Example Calculation:</strong></p>
+          <ul style="color:var(--text-dim);margin-left:20px;line-height:1.8;">
+            <li>You have a <strong>1300mAh</strong> battery with a <strong>100C</strong> rating.</li>
+            <li>Convert mAh to Amp Hours = <strong>1.3 Ah</strong>.</li>
+            <li>1.3 Ah × 100C = <strong>130 Amps of continuous safe draw</strong>.</li>
+            <li>Warning: Manufacturer C-Ratings are often inflated. If your 4 motors pull 40A each at max throttle, that's a total pull of 160A. A sudden 160A punch on a 130A battery will drastically trigger voltage sag.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 5: VTX & Antennas -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">5. Radio & Video Link Physics (VTX)</h2>
+        <div class="cards-grid">
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Power Outputs (mW)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">A VTX transmitting at 800mW is not "twice as far" as 400mW. RF power follows the Inverse Square Law. You must quadruple the power to double the range. Prioritize high-quality antennas over raw output power to prevent overheating.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Polarization (RHCP vs LHCP)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Your Goggles and Drone <strong>must</strong> use the same polarization. If you have a Left-Hand Circular Polarized (LHCP) antenna on your drone, but an RHCP on your goggles, you lose nearly 30dB of signal (a 99.9% power loss).</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Control Link Penetration</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Lower frequencies penetrate concrete better. 900MHz (Crossfire/ELRS) bends around trees beautifully. 2.4GHz (Standard ELRS) bounces off surfaces but carries more data packets per second for lower latency.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 6: Wire Gauge Matrix -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">6. AWG Wire Gauge Matrix</h2>
+        <p style="color:var(--text-dim);margin-bottom:32px;">Using thin wire for high current will cause a drone fire. Using thick wire for signals adds dead weight.</p>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">12-14 AWG (Main Battery Leads)</h3>
+                <p>Used strictly for the XT60 pigtail connecting your battery to the ESC. Built to handle bursts of 100A-160A without melting.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">18-20 AWG (Motor Phase Lines)</h3>
+                <p>Connects the three phases of the brushless motor to the ESC pads. Manufacturers pre-install the correct gauge for the motor's amp draw.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">28-30 AWG (Low-Level Signal Lines)</h3>
+                <p>Silicon/Teflon coated thin wires used exclusively for UART data (RX/TX) or 5V power to receivers. These carry virtually zero current.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Open Source / Support Section -->
+      <section style="margin-bottom:80px;">
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);max-width:800px;margin:0 auto;border:1px solid var(--border);">
+          <div style="text-align:center;margin-bottom:32px;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.05);margin-bottom:16px;border:1px solid var(--border);">
+              <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.646 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.376.202 2.394.1 2.646.64.699 1.026 1.592 1.026 2.683 0 3.842-2.337 4.687-4.565 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/></svg>
+            </div>
+            <h2 class="section-title" style="margin-bottom:16px;">Proprietary Framework</h2>
+            <p style="color:var(--text-dim);font-size:1.1rem;">SkyForged belongs to the community. We are building the ultimate drone intelligence platform, and we need your help to add features, refine calculations, and maintain the database.</p>
+          </div>
+
+          <div style="max-width:500px;margin:0 auto;background:rgba(0,0,0,0.2);padding:32px;border-radius:var(--radius-md);border:1px solid var(--border);">
+            <h3 style="color:var(--accent);margin-bottom:12px;text-align:center;">Contribute Code & Data</h3>
+            <ul style="color:var(--text-dim);margin-left:20px;line-height:1.6;margin-bottom:24px;">
+              <li>Add new drone platforms to the DB.</li>
+              <li>Write new tools and calculators.</li>
+              <li>Expand the Academy syllabus.</li>
+            </ul>
+            <a href="https://github.com/Saitanveesh/skyforged" class="btn btn-primary" style="width:100%;text-align:center;">Fork on GitHub →</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="academy.html">Academy</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="tools.html">Tools</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="platforms.html">Platforms</a>
+      <a href="builder.html">Builder</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

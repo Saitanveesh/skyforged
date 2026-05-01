@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged / Builder</title>
+  <meta name="description" content="Assemble drone builds from vetted parts. Made by Sai Tanveesh.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner">
+    <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Builder</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">The Bench</a></li>
+      <li><a href="academy.html">Academy</a></li>
+      <li><a href="anatomy.html">Anatomy</a></li>
+      <li><a href="blueprint.html">Blueprint</a></li>
+      <li><a href="maps.html">Maps</a></li>
+      <li><a href="pid.html">PID Tuning</a></li>
+      <li><a href="handbook.html">Handbook</a></li>
+      <li><a href="platforms.html">Platforms</a></li>
+      <li><a href="tools.html">RF Tools</a></li>
+      <li><a href="ops.html" class="active">Ops Center</a></li>
+      <li><a href="builder.html" class="active">Builder</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+  </div></nav>
+ 
+  <div class="page-body">
+    <div class="container">
+      <h1 style="font-family:var(--font-mono);font-size:1.6rem;font-weight:700;margin-bottom:8px;">Model Builder</h1>
+      <p style="color:var(--text-dim);margin-bottom:32px;max-width:640px;">Assemble drone builds from vetted parts. Real-time compatibility engine validates component combinations as you build.</p>
+ 
+      <div class="builder-layout">
+        <div style="display:flex;flex-direction:column;gap:32px;">
+          <!-- Build Slots -->
+          <div class="build-slots" id="buildSlots"></div>
+          
+          <div class="callout" style="border-left-color:var(--accent-alt);">
+            <div class="callout-title" style="color:var(--accent-alt);">Beginner Builder Strategy</div>
+            <p>Start with your <strong>Frame</strong>. Its size determines which <strong>Props</strong> and <strong>Motors</strong> will fit. Use the "Model Builder" to check 20x20 vs 30x30 mounting patterns before you buy!</p>
+            <a href="blueprint.html" class="btn btn-sm" style="margin-top:12px;background:var(--bg-layer);">Read the Selection Math Guide →</a>
+          </div>
+        </div>
+ 
+        <!-- Summary Sidebar -->
+        <div class="build-summary">
+          <div class="summary-title">Build Summary</div>
+          <div id="summaryContent">
+            <div class="summary-row"><span class="label">Components</span><span class="value" id="sumComponents">0 / 32</span></div>
+            <div class="summary-row"><span class="label">Total Weight</span><span class="value" id="sumWeight">0 g</span></div>
+            <div class="summary-row"><span class="label">Voltage</span><span class="value" id="sumVoltage">—</span></div>
+            <div class="summary-row summary-total"><span class="label">Est. Cost</span><span class="value" id="sumCost">$0</span></div>
+          </div>
+ 
+          <div style="margin-top:24px;">
+            <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;">Compatibility Checks</div>
+            <div class="check-list" id="checkList"></div>
+          </div>
+ 
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:8px;">
+            <button class="btn btn-sm" onclick="resetBuild()">Reset Build</button>
+            <button class="btn btn-sm btn-primary" onclick="exportBuild()">Export Build</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Component Picker Modal -->
+  <div class="search-overlay" id="pickerOverlay">
+    <div class="search-box" style="max-width:700px;">
+      <div class="search-input-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="pickerSearch" placeholder="Search components...">
+        <span class="search-kbd" onclick="closePicker()">ESC</span>
+      </div>
+      <div class="search-results" id="pickerResults" style="max-height:500px;"></div>
+    </div>
+  </div>
+ 
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="tools.html">Tools</a>
+      <a href="platforms.html">Platforms</a>
+    </div>
+  </footer>
+ 
+  <script src="js/main.js"></script>
+  <script src="js/database.js"></script>
+  <script src="js/builder.js"></script>
+</body>
+</html>

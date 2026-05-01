@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyForged Academy — Complete Drone Syllabus</title>
+  <meta name="description" content="The complete end-to-end syllabus for drone building, intelligence, and piloting. Focused on DGCA compliance and Indian flight regulations.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">SkyForged <span style="color:var(--text-muted);font-weight:400">/ Academy</span></a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">The Bench</a></li>
+        <li><a href="academy.html" class="active">Academy</a></li>
+        <li><a href="anatomy.html">Anatomy</a></li>
+        <li><a href="blueprint.html">Blueprint</a></li>
+        <li><a href="maps.html">Maps</a></li>
+        <li><a href="pid.html">PID Tuning</a></li>
+        <li><a href="handbook.html">Handbook</a></li>
+        <li><a href="platforms.html">Platforms</a></li>
+        <li><a href="tools.html">RF Tools</a></li>
+        <li><a href="ops.html">Ops Center</a></li>
+        <li><a href="builder.html">Builder</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">☰</button>
+    </div>
+  </nav>
+
+  <div class="page-body">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:80px;">
+        <div class="brand-powered" style="color:var(--accent);font-size:0.7rem;font-weight:700;letter-spacing:0.2em;margin-bottom:12px;text-transform:uppercase;">THE ACADEMY</div>
+        <h1 class="hero-title" style="font-size:clamp(2rem,5vw,3.5rem);">The Complete <span class="text-gradient">Syllabus</span></h1>
+        <p style="color:var(--text-dim);font-size:1.1rem;max-width:720px;margin:0 auto;">Your zero-to-hero journey. We cover everything from buying your first gear, to defining what a motor is, to taking your first flight, and finally maintaining your craft. Read sequentially.</p>
+      </div>
+
+      <!-- Phase 1: The Shopping Lexicon -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 1: The Buying Lexicon</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <p style="margin-bottom:24px;color:var(--text-dim);">Before buying anything, you must understand the industry acronyms. Drones are sold in different states of completion.</p>
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">DGCA Categories</h3>
+                <p>In India, drones are classified by weight: <strong>Nano</strong> (≤250g), <strong>Micro</strong> (250g-2kg), <strong>Small</strong> (2kg-25kg), <strong>Medium</strong>, and <strong>Large</strong>. Nano drones are the easiest to start with as they allow for expanded flight zones under DGCA rules.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">BNF (Bind 'N' Fly)</h3>
+                <p>The drone is fully built and tested by the manufacturer, and it includes a receiver. You must provide your own Radio and Goggles. You simply "Bind" the drone to your radio and go.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">PNP (Plug 'N' Play)</h3>
+                <p>The drone is built, but it does <strong>not</strong> include a receiver. You must buy your own receiver, solder it into the drone yourself, and then bind it to your radio. Best if you have a specific radio protocol you prefer.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 2: Anatomy -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 2: Anatomy of a Drone</h2>
+        <p style="color:var(--text-dim);margin-bottom:32px;">Every FPV drone, regardless of size, is built using these six fundamental components. Learn their roles.</p>
+        <div class="cards-grid">
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">1. The Frame</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">The carbon-fiber skeleton. Measured in inches based on the maximum propeller size it can hold (e.g., a "5-inch frame").</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">2. Motors (Brushless)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">The muscle. Defined by stator size (e.g., 2207) and KV (RPM per volt). Lower KV = more torque. Higher KV = more speed.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">3. ESCs</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Electronic Speed Controllers route high-voltage battery power to spin the motors precisely based on signals from the FC. Usually combined into a "4-in-1" board.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">4. FC (Flight Controller)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">The brain. Contains the gyro chip to sense movement. Runs Betaflight/iNav and calculates thousands of adjustments per second to keep the drone level.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">5. VTX (Video Transmitter)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">The broadcaster. Sends the live camera feed straight into your goggles. Comes in Analog or Digital formats.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">6. RX (Receiver)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">The listener. Captures your stick movements from your radio controller and feeds them directly into the Flight Controller.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 3: Workbench -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 3: The Builder's Workbench</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <p style="margin-bottom:24px;color:var(--text-dim);">Building drones is 70% soldering and 30% assembling. These are the non-negotiable tools you need to do it safely.</p>
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Temperature-Controlled Soldering Iron</h3>
+                <p>Do not use a cheap $10 plug-in iron. You need an iron that maintains a steady 350-400°C (like a TS100 or Pinecil). Use 63/37 Leaded Solder — lead-free is too brittle and hard for beginners to melt.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">The Smoke Stopper</h3>
+                <p>A $5 resettable fuse you plug in between your battery and the drone when turning it on for the first time. If you soldered a short circuit, this trips instantly, saving hundreds of dollars in fried electronics.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Digital Multimeter</h3>
+                <p>Used primarily in "Continuity Mode" to test if two points are electrically connected. Always beep-test the positive and negative battery pads before plugging in power.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">High-Quality Hex Drivers</h3>
+                <p>Drones use 1.5mm, 2.0mm, and 2.5mm hex screws. Cheap Allen keys will strip the screws on your motors and frame. Invest in steel drivers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 4: Battery Science -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 4: Battery Science (LiPo 101)</h2>
+        <p style="color:var(--text-dim);margin-bottom:32px;">Lithium Polymer (LiPo) batteries are highly energetic. Disrespecting them leads to fires. Memorize this.</p>
+        <div class="cards-grid">
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">S-Rating (Cells)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">"S" denotes how many cells are in series. 1 cell = 3.7V nominal. A 4S battery is 14.8V. A 6S is 22.2V. 6S is the modern standard for 5-inch drones, offering less voltage sag.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Capacity & C-Rating</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Capacity (mAh) is the fuel tank size (usually 1000-1300mAh for freestyle). C-Rating is the throttle flow rate. High C-Rating means the battery can dump energy faster without overheating.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">The 1C Charging Rule</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Always charge at 1 times the capacity. If you have a 1300mAh battery, charge it at 1.3 Amps. Charging faster degrades the battery and risks thermal runaway.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Storage Voltage</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Never store a LiPo fully charged or fully empty. They must be stored at ~3.8V per cell. Leaving them fully charged for days destroys internal chemistry.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 5: Comms -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 5: Radio & Video Links</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:32px;">
+            <div>
+              <h3 style="color:var(--accent);margin-bottom:12px;">Control: ExpressLRS (ELRS)</h3>
+              <p style="color:var(--text-dim);line-height:1.6;">Don't bother with older protocols like FrSky. ExpressLRS is an advanced, ultra-low latency, extreme-range protocol. Operating typically around 2.4GHz, it provides ranges exceeding 30km with incredibly fast response times (up to 1000Hz). It is the undisputed standard today.</p>
+            </div>
+            <div>
+              <h3 style="color:var(--accent);margin-bottom:12px;">Video: Analog vs Digital</h3>
+              <p style="color:var(--text-dim);line-height:1.6;"><strong>Analog (5.8GHz):</strong> Looks like 1990s static TV. Zero latency, cheap, breaks up gracefully when flying behind concrete.<br><br><strong>Digital (DJI, Walksnail, HDZero):</strong> Looks like HD video games. Incredible clarity, makes flying much easier, but heavily reliant on expensive gear.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 6: Software -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 6: Software & Configuration</h2>
+        <p style="color:var(--text-dim);margin-bottom:32px;">The drone won't fly until you tell the Flight Controller what hardware it has. We use an app called Betaflight Configurator.</p>
+        <div class="roadmap">
+          <div class="roadmap-step">
+            <div class="roadmap-content">
+              <h3 style="color:var(--accent);margin-bottom:8px;">1. Flashing Firmware</h3>
+              <p>Like installing Windows on a new PC, you connect the FC via USB and flash the latest version of Betaflight firmware corresponding to your FC's specific target name.</p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-content">
+              <h3 style="color:var(--accent);margin-bottom:8px;">2. Ports & Protocols</h3>
+              <p>Tell the FC where things are. "My receiver is on UART2", "My VTX is on UART1". Set the receiver protocol to CRSF (used by ELRS) so the FC can read your radio inputs.</p>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-content">
+              <h3 style="color:var(--accent);margin-bottom:8px;">3. Set Up Modes (Switches)</h3>
+              <p>Map your radio switches to logical functions: Switch A is <strong>Arm/Disarm</strong> (turns motors on/off). Switch B is <strong>Flight Mode</strong> (Acro mode vs Angle/Stabilized mode). Switch C is <strong>Turtle Mode</strong> (flips the drone over when stuck).</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 7: Kinematics -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 7: Flight Dynamics & Kinematics</h2>
+        <p style="color:var(--text-dim);margin-bottom:32px;">A quadcopter has no moving parts other than four spinning props. To move, it speeds up or slows down specific motors.</p>
+        <div class="cards-grid">
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Throttle (Altitude)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">All four motors speed up equally. The drone pushes more air down, lifting it higher.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Pitch (Forward/Back)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Rear motors speed up while front motors slow down. The drone tilts forward and moves ahead.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Roll (Left/Right)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Right motors speed up while left motors slow down. The drone tilts left and slides sideways.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Yaw (Spin)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Diagonal pairs of motors change speed to create torque. The drone spins like a top on its Z-axis.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 8: Wiring -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 8: Wiring & Connections 101</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Power Lines (Voltage)</h3>
+                <p>Thick wires (usually Red and Black) carry battery power directly to the ESCs. They carry high voltage and high current. <strong>Never criss-cross these.</strong> Make sure all grounds (black wires) share a common path to prevent noise.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Signal Lines</h3>
+                <p>Thin wires that carry data and instructions (e.g., from FC to ESCs, or Receivers to FC). They don't carry heavy current. Keep them away from power lines to reduce electrical interference.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">UARTs (The Comm Ports)</h3>
+                <p>UARTs are like USB ports for your flight controller. They always work in pairs: <strong>TX (Transmit)</strong> on the device connects to <strong>RX (Receive)</strong> on the FC. TX connects to RX. RX connects to TX. Do not connect TX to TX.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 9: Sim & Maiden -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 9: Simulators & The Maiden Flight</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <div style="margin-bottom:32px;">
+            <h3 style="font-family:var(--font-mono);margin-bottom:12px;color:var(--accent);">The Rule of Simulator Hours</h3>
+            <p style="color:var(--text-dim);line-height:1.6;">Flying Acro mode is like balancing a marble on a sheet of glass. You WILL crash on your first flight. Connect your radio to your PC and practice in Liftoff or VelociDrone for at least 10 hours before flying the real thing. It will save you hundreds in broken carbon fiber.</p>
+          </div>
+          
+          <h3 style="font-family:var(--font-mono);margin-bottom:16px;">New Pilot Prep Checklist</h3>
+          <ul class="checklist-beginner">
+            <li class="checklist-item"><input type="checkbox"> <span class="checklist-text">I have practiced on a simulator for 10+ hours.</span></li>
+            <li class="checklist-item"><input type="checkbox"> <span class="checklist-text">I know how to "Disarm" my drone instantly without looking at the radio.</span></li>
+            <li class="checklist-item"><input type="checkbox"> <span class="checklist-text">I have checked for local flight regulations and no-fly zones.</span></li>
+            <li class="checklist-item"><input type="checkbox"> <span class="checklist-text">My props are spinning in the correct direction (Checked in Betaflight Motors tab).</span></li>
+            <li class="checklist-item"><input type="checkbox"> <span class="checklist-text">Failsafe is configured and tested (Props OFF: Turn off radio -> motors instantly stop).</span></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Phase 10: Maintenance -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 10: Post-Flight & Crash Recovery</h2>
+        <div class="glass" style="padding:40px;border-radius:var(--radius-lg);">
+          <p style="margin-bottom:24px;color:var(--text-dim);">Crashing is part of learning. How you handle the drone after a crash dictates if it will fly again tomorrow.</p>
+          <div class="roadmap">
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Disarm Instantly</h3>
+                <p>The moment you realize a crash is unavoidable, hit your Disarm switch. If you leave the drone armed while stuck in a tree, the motors will desperately try to spin, overheat, and burst into flames.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Check Motor Health</h3>
+                <p>After a crash (especially into dirt), spin each motor with your hand. If it feels gritty, there is dirt/magnetic debris inside the bell. If you arm it while gritty, you will destroy the coils. Take the bell off and clean it.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Inspect Props & Nuts</h3>
+                <p>Bent props cause violent vibrations that mess with your gyro and overheat your motors. Replace entirely bent props. Ensure your prop-nuts are tight; they often loosen during impacts.</p>
+              </div>
+            </div>
+            <div class="roadmap-step">
+              <div class="roadmap-content">
+                <h3 style="color:var(--accent);margin-bottom:8px;">Verify Battery Strap & Cables</h3>
+                <p>A battery ejecting mid-air is an instant blackout. Ensure Kevlar straps are tight, and that battery balance leads haven't been chopped by spinning propellers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 11: Troubleshooting -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 11: Common Troubleshooting</h2>
+        <div class="glossary-grid">
+          <div class="glossary-card">
+            <div class="glossary-term">"My Drone Flips Instantly on Takeoff"</div>
+            <div class="glossary-definition">Usually 3 reasons: Props are on backward, motors are spinning the wrong direction, or the FC board orientation is off by 90/180 degrees.</div>
+          </div>
+          <div class="glossary-card">
+            <div class="glossary-term">"It Won't Arm"</div>
+            <div class="glossary-definition">Throttle isn't at absolute zero, or the drone isn't sitting on a level surface. Look at your OSD (On-Screen Display) for the specific warning flag (e.g., THRD means throttle is up).</div>
+          </div>
+          <div class="glossary-card">
+            <div class="glossary-term">"No Video on Goggles"</div>
+            <div class="glossary-definition">You are on the wrong channel. Don't rely on auto-scan; manually set your Goggles and VTX to the exact same frequency (e.g., Raceband 8 / 5917 MHz).</div>
+          </div>
+          <div class="glossary-card">
+            <div class="glossary-term">"Motors Twitch but Don't Spin"</div>
+            <div class="glossary-definition">Usually a bad phase wire connection between the ESC and the motor. Check your soldering and ensure motor mounting screws aren't touching the copper windings inside.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Phase 12: Laws & Airspace -->
+      <section style="margin-bottom:100px;">
+        <h2 class="section-title">Phase 12: Laws, Rules, & Airspace</h2>
+        <div class="cards-grid">
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Visual Line of Sight (VLOS)</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">By law in most countries, you must be able to see the drone with your naked eye. For FPV pilots wearing goggles, this means you legally need a "Spotter" standing next to you.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Registration & UIN</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">In India, all drones (except Nano) must be registered with the DGCA to obtain a UIN. All pilots must also register on the Digital Sky portal.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">NPNT Compliance</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">No Permission, No Takeoff. Most Indian-certified drones require a "handshake" with the Digital Sky app before they can arm the motors.</p>
+          </div>
+          <div class="card" style="background:transparent;border:1px solid var(--border);">
+            <h3 style="color:var(--accent-alt);margin-bottom:8px;">Airspace Limits</h3>
+            <p style="font-size:0.9rem;color:var(--text-dim);">Never fly above 120 meters (400 feet). Use the Digital Sky Airspace Map to ensure you are in a Green Zone, avoiding Red (Prohibited) and Yellow (Restricted) zones.</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p class="footer-text">SkyForged — Made by Sai Tanveesh<br><span style="font-size:0.75rem;color:var(--accent-alt);">&copy; 2026 Sai Tanveesh. All Rights Reserved. Proprietary Software. Unauthorized copying, modification, or distribution is strictly prohibited.</span></p>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="handbook.html">Handbook</a>
+      <a href="tools.html">Tools</a>
+      <a href="ops.html">Ops Center</a>
+      <a href="platforms.html">Platforms</a>
+      <a href="builder.html">Builder</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

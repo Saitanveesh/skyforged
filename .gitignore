@@ -1,0 +1,14 @@
+# Development scripts
+scripts/
+gen_db.ps1
+gen_db.py
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Other workspace projects
+birthday-surprise/
+drone-workshop-tool/
+neeharika-birthday/
+fix.py
